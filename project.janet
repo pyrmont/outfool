@@ -1,6 +1,6 @@
 (declare-project
   :name "Outfool"
-  :description "Janet bindings for utf8.h"
+  :description "A foolish attempt to provide better UTF-8 support in Janet"
   :author "Michael Camilleri"
   :license "MIT"
   :url "https://github.com/pyrmont/outfool"
