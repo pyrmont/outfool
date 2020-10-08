@@ -22,5 +22,9 @@
   :name "outfool"
   :cflags cflags
   :lflags lflags
-  :headers ["src/outfool.h"]
-  :source ["src/outfool.c"])
+  :headers ["src/rope.h"
+            "src/outfool.h"]
+  :source ["src/rope.c"
+           "src/outfool.c"
+           "src/outfool/functions.c"
+           "src/outfool/type.c"])
