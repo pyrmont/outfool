@@ -1,4 +1,5 @@
 /* UTF-8 Rope implementation by Joseph Gentle
+ * with modifications by Michael Camilleri
  *
  * This library implements a heavyweight utf8 string type with fast
  * insert-at-position and delete-at-position operations.
@@ -76,10 +77,6 @@ typedef struct {
   // The first node exists inline in the rope structure itself.
   rope_node_t head;
 } rope_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // Create a new rope with no contents
 rope_t *rope_new();
@@ -164,9 +161,5 @@ static inline size_t rope_node_chars(rope_node_t *n) {
 // For debugging.
 void _rope_check(rope_t *r);
 void _rope_print(rope_t *r);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
