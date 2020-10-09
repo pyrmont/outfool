@@ -10,6 +10,10 @@ typedef struct {
     size_t next_byte;
 } outfool_rope_t;
 
+/* Forward Declarations */
+
+static int outfool_rope_method(Janet key, Janet *out);
+
 /* Utility Methods */
 
 static uint8_t *outfool_rope_cstr(outfool_rope_t *rope) {
@@ -44,6 +48,10 @@ static int outfool_rope_gc(void *p, size_t size) {
 
 static int outfool_rope_get(void *p, Janet key, Janet *out) {
     outfool_rope_t *rope = (outfool_rope_t *)p;
+
+    if (janet_checktype(key, JANET_KEYWORD)) {
+        return outfool_rope_method(key, out);
+    }
 
     if (!janet_checksize(key)) janet_panic("expected size as key");
     size_t index = (size_t) janet_unwrap_number(key);
@@ -169,7 +177,7 @@ static const JanetAbstractType outfool_rope_type = {
     JANET_ATEND_NEXT
 };
 
-/* Methods */
+/* Constructor */
 
 static Janet cfun_outfool_rope(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
@@ -179,12 +187,29 @@ static Janet cfun_outfool_rope(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(rope);
 }
 
-
 static const JanetReg cfuns[] = {
     {"rope", cfun_outfool_rope, NULL},
     {NULL, NULL, NULL}
 };
 
+/* Methods */
+
+static Janet outfool_rope_method_length(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    outfool_rope_t *rope = (outfool_rope_t *)janet_getabstract(argv, 0, &outfool_rope_type);
+    return janet_wrap_number(rope->data->num_chars);
+}
+
+static JanetMethod outfool_rope_methods[] = {
+    {"length", outfool_rope_method_length},
+    {NULL, NULL}
+};
+
+static int outfool_rope_method(Janet key, Janet *out) {
+    return janet_getmethod(janet_unwrap_keyword(key), outfool_rope_methods, out);
+}
+
+/* Environment Registration */
 
 void outfool_register_type(JanetTable *env) {
     janet_register_abstract_type(&outfool_rope_type);

@@ -61,4 +61,14 @@
   (is (not (= rope1 rope2))))
 
 
+(deftest length-of-rope-of-ascii-chars
+  (def rope (outfool/rope "abc"))
+  (is (= 3 (length rope))))
+
+
+(deftest length-of-rope-of-non-ascii-chars
+  (def rope (outfool/rope "あいうえお"))
+  (is (= 5 (length rope))))
+
+
 (run-tests!)
