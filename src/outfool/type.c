@@ -19,7 +19,11 @@ static uint8_t *outfool_rope_cstr(outfool_rope_t *rope) {
 
 /* Garbage Collection */
 
-static void outfool_rope_init(outfool_rope_t *rope, uint8_t *cstring) {
+static void outfool_rope_init(outfool_rope_t *rope, uint8_t *input) {
+    size_t input_len = strlen((char *)input) + 1;
+    uint8_t *cstring = malloc(sizeof(uint8_t) * input_len);
+    memcpy(cstring, input, input_len);
+
     rope_t *r = rope_new();
     rope_insert(r, 0, cstring);
     rope->data = r;
@@ -30,7 +34,10 @@ static void outfool_rope_init(outfool_rope_t *rope, uint8_t *cstring) {
 
 static void outfool_rope_deinit(outfool_rope_t *rope) {
     rope_free(rope->data);
-    free(rope->cstring);
+    if (NULL != rope->cstring) {
+        free(rope->cstring);
+        rope->cstring = NULL;
+    }
 }
 
 static int outfool_rope_gc(void *p, size_t size) {
