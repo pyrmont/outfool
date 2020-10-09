@@ -48,15 +48,17 @@ static int outfool_rope_get(void *p, Janet key, Janet *out) {
     if (!janet_checksize(key)) janet_panic("expected size as key");
     size_t index = (size_t) janet_unwrap_number(key);
 
-    if (index >= rope->data->num_chars || rope->next_byte >= rope->data->num_bytes) {
+    if (index >= rope->data->num_chars) {
         return 0;
     }
 
+    if (NULL == rope->cstring) rope->cstring = outfool_rope_cstr(rope);
+
     size_t width;
-    if (NULL != rope->cstring && index == rope->last_pos + 1) {
+    if (index == rope->last_pos + 1) {
         width = codepoint_size(rope->cstring[rope->next_byte]);
     } else {
-        rope->cstring = outfool_rope_cstr(rope);
+        rope->next_byte = 0;
         width = codepoint_size(rope->cstring[rope->next_byte]);
         size_t i = 0;
         while(index != i) {
