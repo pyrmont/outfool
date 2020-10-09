@@ -20,9 +20,9 @@ static uint8_t *outfool_rope_cstr(outfool_rope_t *rope) {
 /* Garbage Collection */
 
 static void outfool_rope_init(outfool_rope_t *rope, uint8_t *input) {
-    size_t input_len = strlen((char *)input) + 1;
-    uint8_t *cstring = malloc(sizeof(uint8_t) * input_len);
-    memcpy(cstring, input, input_len);
+    size_t input_length = strlen((char *)input) + 1;
+    uint8_t *cstring = malloc(sizeof(uint8_t) * input_length);
+    memcpy(cstring, input, input_length);
 
     rope_t *r = rope_new();
     rope_insert(r, 0, cstring);
@@ -53,15 +53,21 @@ static JanetMethod outfool_rope_methods[2];
 
 static int outfool_rope_get(void *p, Janet key, Janet *out) {
     outfool_rope_t *rope = (outfool_rope_t *)p;
+    int32_t rope_length = rope->data->num_chars;
 
     if (janet_checktype(key, JANET_KEYWORD)) {
         return janet_getmethod(janet_unwrap_keyword(key), outfool_rope_methods, out);
     }
 
-    if (!janet_checksize(key)) janet_panic("expected size as key");
-    size_t index = (size_t) janet_unwrap_number(key);
+    if (!janet_checktype(key, JANET_NUMBER)) janet_panic("expected size as number");
 
-    if (index >= rope->data->num_chars) {
+    int32_t input_index = janet_unwrap_integer(key);
+    if (janet_unwrap_number(key) - (double)input_index != 0) janet_panic("expected size as integer");
+    if (rope_length + input_index < 0) return 0;
+
+    size_t index = (input_index < 0) ? (rope_length + input_index) : input_index;
+
+    if (index >= (size_t)rope_length) {
         return 0;
     }
 
