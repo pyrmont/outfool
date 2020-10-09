@@ -10,10 +10,6 @@ typedef struct {
     size_t next_byte;
 } outfool_rope_t;
 
-/* Forward Declarations */
-
-static int outfool_rope_method(Janet key, Janet *out);
-
 /* Utility Methods */
 
 static uint8_t *outfool_rope_cstr(outfool_rope_t *rope) {
@@ -46,11 +42,13 @@ static int outfool_rope_gc(void *p, size_t size) {
 
 /* Accessing */
 
+static JanetMethod outfool_rope_methods[2];
+
 static int outfool_rope_get(void *p, Janet key, Janet *out) {
     outfool_rope_t *rope = (outfool_rope_t *)p;
 
     if (janet_checktype(key, JANET_KEYWORD)) {
-        return outfool_rope_method(key, out);
+        return janet_getmethod(janet_unwrap_keyword(key), outfool_rope_methods, out);
     }
 
     if (!janet_checksize(key)) janet_panic("expected size as key");
@@ -204,10 +202,6 @@ static JanetMethod outfool_rope_methods[] = {
     {"length", outfool_rope_method_length},
     {NULL, NULL}
 };
-
-static int outfool_rope_method(Janet key, Janet *out) {
-    return janet_getmethod(janet_unwrap_keyword(key), outfool_rope_methods, out);
-}
 
 /* Environment Registration */
 
